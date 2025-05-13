@@ -5,10 +5,12 @@ import TodoItem from "./TodoItem";
 function App() {
   // 과제1-1: 7-1, 7-2강을 듣고 이곳에 투두리스트 컴포넌트를 작성해주세요.
   const [toDo, setToDo] = useState("");
-  const [toDos, setToDos] = useState(() => {
-    const item = localStorage.getItem("todos");
-    return item ? JSON.parse(item) : [];
-  });
+  const [toDos, setToDos] = useState([]);
+
+  useEffect(() => {
+    const storedValue = localStorage.getItem("todos");
+    if (storedValue) setToDos(JSON.parse(storedValue));
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(toDos));
@@ -18,7 +20,7 @@ function App() {
 
   const onSubmit = (event) => {
     event.preventDefault();
-    if (toDo === "") {
+    if (toDo.trim() === "") {
       return;
     }
     setToDos((currentArray) => [toDo, ...currentArray]);
@@ -28,7 +30,6 @@ function App() {
   const onDelete = (value) => {
     setToDos((prev) => prev.filter((item) => item !== value));
   };
-
 
   return (
     <div className="todolist">
@@ -42,11 +43,12 @@ function App() {
         />
         <button>Add To Do</button>
       </form>
-      <hr/>
+      <hr />
       <ul>
-        {toDos.map((item, index) => (
-        <TodoItem todo={item} onDelete={() => onDelete(item)}/>
-      ))}
+        {toDos &&
+          toDos.map((item, index) => (
+            <TodoItem key={index} todo={item} onDelete={() => onDelete(item)} />
+          ))}
       </ul>
     </div>
   );
